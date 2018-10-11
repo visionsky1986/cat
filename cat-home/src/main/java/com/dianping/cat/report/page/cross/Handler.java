@@ -50,7 +50,7 @@ public class Handler implements PageHandler<Context> {
 		if (m_service.isEligable(request)) {
 			ModelResponse<CrossReport> response = m_service.invoke(request);
 			CrossReport report = response.getModel();
-			
+
 			return report;
 		} else {
 			throw new RuntimeException("Internal error: no eligable cross service registered for " + request + "!");
