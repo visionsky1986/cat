@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2018, Meituan Dianping. All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dianping.cat.consumer.problem;
 
 import java.util.List;
@@ -7,10 +25,10 @@ import org.apache.commons.lang.StringUtils;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.consumer.GraphTrendUtil;
-import com.dianping.cat.consumer.problem.model.entity.GraphTrend;
 import com.dianping.cat.consumer.problem.model.entity.Duration;
 import com.dianping.cat.consumer.problem.model.entity.Entity;
 import com.dianping.cat.consumer.problem.model.entity.Entry;
+import com.dianping.cat.consumer.problem.model.entity.GraphTrend;
 import com.dianping.cat.consumer.problem.model.entity.Machine;
 import com.dianping.cat.consumer.problem.model.entity.ProblemReport;
 import com.dianping.cat.consumer.problem.model.entity.Segment;
@@ -111,7 +129,7 @@ public class ProblemReportMerger extends DefaultMerger {
 
 		getProblemReport().getIps().addAll(problemReport.getIps());
 	}
-	
+
 	@Override
 	public void mergeGraphTrend(GraphTrend to, GraphTrend from) {
 		String toFails = to.getFails();
@@ -119,7 +137,7 @@ public class ProblemReportMerger extends DefaultMerger {
 		Integer[] fails = mergeIntegerValue(toFails, fromFails);
 		to.setFails(StringUtils.join(fails, GraphTrendUtil.GRAPH_SPLITTER));
 	}
-	
+
 	private Integer[] mergeIntegerValue(String to, String from) {
 		Integer[] result = null;
 		Integer[] source = null;
@@ -143,7 +161,7 @@ public class ProblemReportMerger extends DefaultMerger {
 
 		return result;
 	}
-	
+
 	private Integer[] strToIntegerValue(String[] strs) {
 		if (strs != null) {
 			int size = strs.length;

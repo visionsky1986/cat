@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2018, Meituan Dianping. All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dianping.cat.system.page.router.config;
 
 import java.io.IOException;
@@ -53,6 +71,10 @@ import com.dianping.cat.task.TimerSyncTask.SyncHandler;
 @Named
 public class RouterConfigManager implements Initializable, LogEnabled {
 
+	public static final String DEFAULT = "default";
+
+	private static final String CONFIG_NAME = "routerConfig";
+
 	@Inject
 	private ConfigDao m_configDao;
 
@@ -72,10 +94,6 @@ public class RouterConfigManager implements Initializable, LogEnabled {
 	private Logger m_logger;
 
 	private long m_modifyTime;
-
-	private static final String CONFIG_NAME = "routerConfig";
-
-	public static final String DEFAULT = "default";
 
 	private Map<String, List<SubnetInfo>> m_subNetInfos = new HashMap<String, List<SubnetInfo>>();
 
@@ -185,8 +203,9 @@ public class RouterConfigManager implements Initializable, LogEnabled {
 	}
 
 	public boolean notCustomizedDomains(String group, Domain domainConfig) {
-		boolean noExist = domainConfig == null || domainConfig.findGroup(group) == null
-		      || domainConfig.findGroup(group).getServers().isEmpty();
+		boolean noExist =
+								domainConfig == null || domainConfig.findGroup(group) == null	|| domainConfig.findGroup(group).getServers()
+														.isEmpty();
 
 		return noExist;
 	}
@@ -345,15 +364,15 @@ public class RouterConfigManager implements Initializable, LogEnabled {
 		long time = period.getTime();
 
 		try {
-			DailyReport report = m_dailyReportDao.findByDomainNamePeriod(Constants.CAT, RouterConfigBuilder.ID, period,
-			      DailyReportEntity.READSET_FULL);
+			DailyReport report = m_dailyReportDao
+									.findByDomainNamePeriod(Constants.CAT, RouterConfigBuilder.ID, period,	DailyReportEntity.READSET_FULL);
 			long modifyTime = report.getCreationDate().getTime();
 			Pair<RouterConfig, Long> pair = m_routerConfigs.get(time);
 
 			if (pair == null || modifyTime > pair.getValue()) {
 				try {
-					DailyReportContent reportContent = m_dailyReportContentDao.findByPK(report.getId(),
-					      DailyReportContentEntity.READSET_FULL);
+					DailyReportContent reportContent = m_dailyReportContentDao
+											.findByPK(report.getId(),	DailyReportContentEntity.READSET_FULL);
 					RouterConfig routerConfig = DefaultNativeParser.parse(reportContent.getContent());
 
 					m_routerConfigs.put(time, new Pair<RouterConfig, Long>(routerConfig, modifyTime));

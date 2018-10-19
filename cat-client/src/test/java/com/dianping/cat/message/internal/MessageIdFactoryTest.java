@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2018, Meituan Dianping. All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dianping.cat.message.internal;
 
 import java.io.File;
@@ -7,7 +25,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,9 +34,9 @@ import org.unidal.helper.Threads;
 import org.unidal.helper.Threads.Task;
 
 public class MessageIdFactoryTest {
-	private long m_timestamp = 1330327814748L;
-
 	final static char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
+	private long m_timestamp = 1330327814748L;
 
 	private MessageIdFactory m_factory = new MessageIdFactory() {
 		@Override
@@ -118,7 +135,7 @@ public class MessageIdFactoryTest {
 		}
 
 		mainLatch.await();
-		
+
 		Assert.assertEquals(500000, MessageId.parse(m_factory.getNextId()).getIndex());
 	}
 
@@ -131,12 +148,12 @@ public class MessageIdFactoryTest {
 		check("domain1", "domain1-c0a83f99-369535-2");
 		check("domain1", "domain1-c0a83f99-369535-3");
 
-		m_timestamp = m_timestamp +MessageIdFactory.HOUR;
+		m_timestamp = m_timestamp + MessageIdFactory.HOUR;
 		check("domain1", "domain1-c0a83f99-369536-0");
 		check("domain1", "domain1-c0a83f99-369536-1");
 		check("domain1", "domain1-c0a83f99-369536-2");
 
-		m_timestamp = m_timestamp +MessageIdFactory.HOUR;
+		m_timestamp = m_timestamp + MessageIdFactory.HOUR;
 		check("domain1", "domain1-c0a83f99-369537-0");
 		check("domain1", "domain1-c0a83f99-369537-1");
 		check("domain1", "domain1-c0a83f99-369537-2");
