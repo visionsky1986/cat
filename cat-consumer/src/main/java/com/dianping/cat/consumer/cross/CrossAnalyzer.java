@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2018, Meituan Dianping. All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dianping.cat.consumer.cross;
 
 import java.util.List;
@@ -27,6 +45,8 @@ import com.dianping.cat.report.ReportManager;
 public class CrossAnalyzer extends AbstractMessageAnalyzer<CrossReport> implements LogEnabled {
 	public static final String ID = "cross";
 
+	public static final String DEFAULT = "unknown";
+
 	@Inject(ID)
 	protected ReportManager<CrossReport> m_reportManager;
 
@@ -36,8 +56,6 @@ public class CrossAnalyzer extends AbstractMessageAnalyzer<CrossReport> implemen
 	private int m_discardLogs = 0;
 
 	private int m_errorAppName;
-
-	public static final String DEFAULT = "unknown";
 
 	public CrossInfo convertCrossInfo(String client, CrossInfo crossInfo) {
 		String localAddress = crossInfo.getLocalAddress();
@@ -92,6 +110,10 @@ public class CrossAnalyzer extends AbstractMessageAnalyzer<CrossReport> implemen
 	@Override
 	public ReportManager<CrossReport> getReportManager() {
 		return m_reportManager;
+	}
+
+	public void setReportManager(ReportManager<CrossReport> reportManager) {
+		m_reportManager = reportManager;
 	}
 
 	@Override
@@ -192,8 +214,8 @@ public class CrossAnalyzer extends AbstractMessageAnalyzer<CrossReport> implemen
 
 			String targetDomain = crossInfo.getApp();
 
-			if (m_serverConfigManager.isRpcClient(t.getType()) && !DEFAULT.equals(targetDomain)
-			      && !"null".equalsIgnoreCase(targetDomain)) {
+			if (m_serverConfigManager.isRpcClient(t.getType()) && !DEFAULT.equals(targetDomain)	&& !"null"
+									.equalsIgnoreCase(targetDomain)) {
 				CrossInfo serverCrossInfo = convertCrossInfo(tree.getDomain(), crossInfo);
 
 				if (serverCrossInfo != null) {
@@ -209,10 +231,6 @@ public class CrossAnalyzer extends AbstractMessageAnalyzer<CrossReport> implemen
 
 	public void setIpConvertManager(IpConvertManager ipConvertManager) {
 		m_ipConvertManager = ipConvertManager;
-	}
-
-	public void setReportManager(ReportManager<CrossReport> reportManager) {
-		m_reportManager = reportManager;
 	}
 
 	public void setServerConfigManager(ServerConfigManager serverConfigManager) {
@@ -288,44 +306,44 @@ public class CrossAnalyzer extends AbstractMessageAnalyzer<CrossReport> implemen
 			}
 		}
 
-		public String getClientPort() {
-			return m_clientPort;
-		}
-
-		public String getDetailType() {
-			return m_detailType;
-		}
-
-		public String getLocalAddress() {
-			return m_localAddress;
-		}
-
-		public String getRemoteAddress() {
-			return m_remoteAddress;
-		}
-
-		public String getRemoteRole() {
-			return m_remoteRole;
-		}
-
 		public void setApp(String app) {
 			m_app = app;
+		}
+
+		public String getClientPort() {
+			return m_clientPort;
 		}
 
 		public void setClientPort(String clientPort) {
 			m_clientPort = clientPort;
 		}
 
+		public String getDetailType() {
+			return m_detailType;
+		}
+
 		public void setDetailType(String detailType) {
 			m_detailType = detailType;
+		}
+
+		public String getLocalAddress() {
+			return m_localAddress;
 		}
 
 		public void setLocalAddress(String localAddress) {
 			m_localAddress = localAddress;
 		}
 
+		public String getRemoteAddress() {
+			return m_remoteAddress;
+		}
+
 		public void setRemoteAddress(String remoteAddress) {
 			m_remoteAddress = remoteAddress;
+		}
+
+		public String getRemoteRole() {
+			return m_remoteRole;
 		}
 
 		public void setRemoteRole(String remoteRole) {

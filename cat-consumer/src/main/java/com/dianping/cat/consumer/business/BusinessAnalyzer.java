@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2018, Meituan Dianping. All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dianping.cat.consumer.business;
 
 import java.util.List;
@@ -22,8 +40,8 @@ import com.dianping.cat.report.DefaultReportManager.StoragePolicy;
 import com.dianping.cat.report.ReportManager;
 
 @Named(type = MessageAnalyzer.class, value = BusinessAnalyzer.ID, instantiationStrategy = Named.PER_LOOKUP)
-public class BusinessAnalyzer extends AbstractMessageAnalyzer<BusinessReport>  implements LogEnabled {
-	
+public class BusinessAnalyzer extends AbstractMessageAnalyzer<BusinessReport> implements LogEnabled {
+
 	public static final String ID = "business";
 
 	@Inject(ID)
@@ -118,7 +136,7 @@ public class BusinessAnalyzer extends AbstractMessageAnalyzer<BusinessReport>  i
 			processMetric(report, metric, domain);
 		}
 	}
-	
+
 	private void processMetric(BusinessReport report, Metric metric, String domain) {
 		boolean isMonitor = Constants.CAT.equals(domain) && StringUtils.isNotEmpty(metric.getType());
 
@@ -145,8 +163,7 @@ public class BusinessAnalyzer extends AbstractMessageAnalyzer<BusinessReport>  i
 				boolean result = m_configManager.insertBusinessConfigIfNotExist(domain, name, config);
 
 				if (!result) {
-					m_logger.error(String.format("error when insert business config info, domain %s, metricName %s", domain,
-					      name));
+					m_logger.error(String.format("error when insert business config info, domain %s, metricName %s", domain,	name));
 				}
 			}
 		}

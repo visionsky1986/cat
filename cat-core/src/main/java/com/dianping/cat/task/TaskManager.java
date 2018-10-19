@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2018, Meituan Dianping. All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dianping.cat.task;
 
 import java.util.Calendar;
@@ -15,15 +33,6 @@ import com.dianping.cat.core.dal.TaskDao;
 @Named
 public class TaskManager {
 
-	@Inject
-	private TaskDao m_taskDao;
-
-	private static final long ONE_HOUR = 60 * 60 * 1000L;
-
-	private static final long ONE_DAY = 24 * ONE_HOUR;
-
-	private static final int STATUS_TODO = 1;
-
 	public static final int REPORT_HOUR = 0;
 
 	public static final int REPORT_DAILY = 1;
@@ -31,6 +40,15 @@ public class TaskManager {
 	public static final int REPORT_WEEK = 2;
 
 	public static final int REPORT_MONTH = 3;
+
+	private static final long ONE_HOUR = 60 * 60 * 1000L;
+
+	private static final long ONE_DAY = 24 * ONE_HOUR;
+
+	private static final int STATUS_TODO = 1;
+
+	@Inject
+	private TaskDao m_taskDao;
 
 	public boolean createTask(Date period, String domain, String name, TaskCreationPolicy prolicy) {
 		try {
@@ -83,17 +101,6 @@ public class TaskManager {
 		m_taskDao.insert(task);
 	}
 
-	public static interface TaskCreationPolicy {
-
-		boolean shouldCreateDailyTask();
-
-		boolean shouldCreateHourlyTask();
-
-		boolean shouldCreateMonthTask();
-
-		boolean shouldCreateWeeklyTask();
-	}
-
 	public enum TaskProlicy implements TaskCreationPolicy {
 
 		ALL {
@@ -119,7 +126,6 @@ public class TaskManager {
 		},
 
 		HOULY {
-
 			@Override
 			public boolean shouldCreateDailyTask() {
 				return false;
@@ -142,7 +148,6 @@ public class TaskManager {
 		},
 
 		ALL_EXCLUED_HOURLY {
-
 			@Override
 			public boolean shouldCreateDailyTask() {
 				return true;
@@ -165,7 +170,6 @@ public class TaskManager {
 		},
 
 		DAILY {
-
 			@Override
 			public boolean shouldCreateDailyTask() {
 				return true;
@@ -188,7 +192,6 @@ public class TaskManager {
 		},
 
 		HOURLY_AND_DAILY {
-
 			@Override
 			public boolean shouldCreateDailyTask() {
 				return true;
@@ -209,6 +212,17 @@ public class TaskManager {
 				return false;
 			}
 		};
+	}
+
+	public static interface TaskCreationPolicy {
+
+		boolean shouldCreateDailyTask();
+
+		boolean shouldCreateHourlyTask();
+
+		boolean shouldCreateMonthTask();
+
+		boolean shouldCreateWeeklyTask();
 	}
 
 }
