@@ -1,5 +1,4 @@
 **CAT**
- [![Build Status](https://travis-ci.org/dianping/cat.png?branch=master)](https://travis-ci.org/dianping/cat)
  [![GitHub stars](https://img.shields.io/github/stars/dianping/cat.svg?style=social&label=Star&)](https://github.com/dianping/cat/stargazers)
  [![GitHub forks](https://img.shields.io/github/forks/dianping/cat.svg?style=social&label=Fork&)](https://github.com/dianping/cat/fork)
 
@@ -67,11 +66,11 @@
 
 ### Quick Start
 
-#### CAT 服务端
+#### 服务端
 
-- [服务端集群部署](https://github.com/dianping/cat/blob/master/cat-doc/posts/ch4-server/README.md)
-- [服务端报表介绍](https://github.com/dianping/cat/blob/master/cat-doc/posts/ch1-report/README.md)
-- [服务端配置手册](https://github.com/dianping/cat/blob/master/cat-doc/posts/ch2-config/README.md)
+- [集群部署](https://github.com/dianping/cat/blob/master/cat-doc/posts/ch4-server/README.md)
+- [报表介绍](https://github.com/dianping/cat/blob/master/cat-doc/posts/ch1-report/README.md)
+- [配置手册](https://github.com/dianping/cat/blob/master/cat-doc/posts/ch2-config/README.md)
 
 ### 项目设计
 
