@@ -52,9 +52,6 @@ public class AlertSummaryVisitor extends BaseVisitor {
 	}
 
 	private String convertNameToChinese(String name) {
-		if (name.equals(AlertType.Network.getName())) {
-			return "网络告警";
-		}
 		if (name.equals(AlertType.Business.getName())) {
 			return "业务告警";
 		}
@@ -67,9 +64,6 @@ public class AlertSummaryVisitor extends BaseVisitor {
 		if (name.equals(AlertInfoBuilder.PREFIX + AlertType.Exception.getName())) {
 			return "依赖异常告警";
 		}
-		if (name.equals(AlertType.System.getName())) {
-			return "系统告警";
-		}
 
 		return "";
 	}
@@ -80,21 +74,21 @@ public class AlertSummaryVisitor extends BaseVisitor {
 
 	@Override
 	public void visitAlert(Alert alert) {
-		Map<Object, Object> tmpALertMap = new HashMap<Object, Object>();
+		Map<Object, Object> tmpAlertMap = new HashMap<Object, Object>();
 
 		String alertDomain = alert.getDomain();
 		if (alertDomain != null && alertDomain.equals(m_domain)) {
-			tmpALertMap.put("metric", alert.getMetric());
+			tmpAlertMap.put("metric", alert.getMetric());
 		} else {
-			tmpALertMap.put("metric", alertDomain + "<br>" + alert.getMetric());
+			tmpAlertMap.put("metric", alertDomain + "<br>" + alert.getMetric());
 		}
-		tmpALertMap.put("domain", alert.getDomain());
-		tmpALertMap.put("dateStr", m_fmt.format(alert.getAlertTime()));
-		tmpALertMap.put("type", alert.getType());
-		tmpALertMap.put("context", alert.getContext());
-		tmpALertMap.put("count", alert.getCount());
+		tmpAlertMap.put("domain", alert.getDomain());
+		tmpAlertMap.put("dateStr", m_fmt.format(alert.getAlertTime()));
+		tmpAlertMap.put("type", alert.getType());
+		tmpAlertMap.put("context", alert.getContext());
+		tmpAlertMap.put("count", alert.getCount());
 
-		m_alertList.add(tmpALertMap);
+		m_alertList.add(tmpAlertMap);
 	}
 
 	@Override

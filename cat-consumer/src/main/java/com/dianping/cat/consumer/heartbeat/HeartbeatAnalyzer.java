@@ -29,6 +29,7 @@ import com.dianping.cat.message.Heartbeat;
 import com.dianping.cat.message.spi.MessageTree;
 import com.dianping.cat.report.DefaultReportManager.StoragePolicy;
 import com.dianping.cat.report.ReportManager;
+import com.dianping.cat.status.model.StatusInfoHelper;
 import com.dianping.cat.status.model.entity.*;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -54,7 +55,7 @@ public class HeartbeatAnalyzer extends AbstractMessageAnalyzer<HeartbeatReport> 
 		StatusInfo info;
 
 		try {
-			info = com.dianping.cat.status.model.transform.DefaultSaxParser.parse(xml);
+			info = StatusInfoHelper.fromXml(xml);
 			RuntimeInfo runtime = info.getRuntime();
 
 			if (runtime != null) {
@@ -63,7 +64,7 @@ public class HeartbeatAnalyzer extends AbstractMessageAnalyzer<HeartbeatReport> 
 				machine.setClasspath("");
 			}
 
-			transalteHearbeat(info);
+			translateHeartbeat(info);
 		} catch (Exception e) {
 			return null;
 		}
@@ -137,7 +138,7 @@ public class HeartbeatAnalyzer extends AbstractMessageAnalyzer<HeartbeatReport> 
 
 			for (Heartbeat h : heartbeats) {
 				if (h.getType().equalsIgnoreCase("heartbeat")) {
-					processHeartbeat(report, (Heartbeat) h, tree);
+					processHeartbeat(report, h, tree);
 				}
 			}
 		}
@@ -157,7 +158,7 @@ public class HeartbeatAnalyzer extends AbstractMessageAnalyzer<HeartbeatReport> 
 		}
 	}
 
-	private void transalteHearbeat(StatusInfo info) {
+	private void translateHeartbeat(StatusInfo info) {
 		try {
 			MessageInfo message = info.getMessage();
 

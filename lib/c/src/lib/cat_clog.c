@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 #include "cat_clog.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "lib/headers.h"
 #include "lib/cat_time_util.h"
@@ -69,15 +72,26 @@ static int CLogUpdateSaveFile() {
         }
 
         char logName[512] = {'\0'};
-        strncat(logName, g_log_save_filepath, 256);
+        
+        char *logFilePrefix;
+        char *cathomevar;
+        cathomevar = getenv("CAT_HOME");
+        if (cathomevar == NULL) {
+            logFilePrefix = g_log_save_filepath;
+        } else {
+            logFilePrefix = (char *) malloc(strlen(cathomevar) + strlen("catlog"));
+            sprintf(logFilePrefix, "%s%s", cathomevar, "catlog");
+        }
+        strncat(logName, logFilePrefix, 256);
+
         if (g_log_file_perDay) {
-            _CLog_dateSuffix(logName + strlen(logName), 128);
+            _CLog_datePostfix(logName + strlen(logName), 128);
         }
         if (g_log_file_with_time) {
             strncat(logName, GetDetailTimeString(0), 64);
         }
         strncat(logName, ".log", 64);
-
+        printf("Using cat log file=%s", logName);
         g_innerLog->m_f_logOut = fopen(logName, "a+");
         if (NULL == g_innerLog->m_f_logOut) {
             _CLog_debugInfo("Log file has been opened in write mode by other process.\n");
@@ -154,8 +168,7 @@ void CLogLogWithLocation(uint16_t type, const char* format, const char* file, in
 void _CLog_log(uint16_t type, const char *buf) {
     char tmpTime[64] = {0};
     const char *tmpType = NULL;
-    char tmpBuf[1024 + 128] = {0};
-    _CLog_timeSuffix(tmpTime, sizeof(tmpTime));
+    _CLog_timePrefix(tmpTime, sizeof(tmpTime));
 
     switch (type) {
         case CLOG_DEBUG:
@@ -175,7 +188,8 @@ void _CLog_log(uint16_t type, const char *buf) {
             break;
     }
 
-    snprintf(tmpBuf, 1024 + 128, "%s%s%s\n", tmpTime, tmpType, buf);
+    char tmpBuf[1024 + 128] = {0};
+    snprintf(tmpBuf, 1024 + 128, "%s [%d][%s] %s\n", tmpTime, getpid(), tmpType, buf);
     _CLog_debugInfo(tmpBuf);
 
     long long nowDay = GetTime64() / 1000 / 3600;

@@ -19,6 +19,7 @@
 package com.dianping.cat.report.page.transaction;
 
 import javax.servlet.ServletException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,7 @@ import org.unidal.web.mvc.annotation.InboundActionMeta;
 import org.unidal.web.mvc.annotation.OutboundActionMeta;
 import org.unidal.web.mvc.annotation.PayloadMeta;
 
+import com.dianping.cat.Cat;
 import com.dianping.cat.Constants;
 import com.dianping.cat.consumer.transaction.TransactionAnalyzer;
 import com.dianping.cat.consumer.transaction.model.entity.Machine;
@@ -116,11 +118,12 @@ public class Handler implements PageHandler<Context> {
 
 		if (transactionName != null) {
 			String graph1 = m_builder
-									.build(new DurationPayload("Duration Distribution", "Duration (ms)", "Count",	transactionName));
+			      .build(new DurationPayload("Duration Distribution", "Duration (ms)", "Count", transactionName));
 			String graph2 = m_builder.build(new HitPayload("Hits Over Time", "Time (min)", "Count", transactionName));
-			String graph3 = m_builder.build(
-									new AverageTimePayload("Average Duration Over Time", "Time (min)",	"Average Duration (ms)", transactionName));
-			String graph4 = m_builder.build(new FailurePayload("Failures Over Time", "Time (min)", "Count",	transactionName));
+			String graph3 = m_builder.build(new AverageTimePayload("Average Duration Over Time", "Time (min)",
+			      "Average Duration (ms)", transactionName));
+			String graph4 = m_builder
+			      .build(new FailurePayload("Failures Over Time", "Time (min)", "Count", transactionName));
 
 			model.setGraph1(graph1);
 			model.setGraph2(graph2);
@@ -172,9 +175,9 @@ public class Handler implements PageHandler<Context> {
 		}
 
 		ModelRequest request = new ModelRequest(domain, payload.getDate()) //
-								.setProperty("type", payload.getType()) //
-								.setProperty("name", name)//
-								.setProperty("ip", ipAddress);
+		      .setProperty("type", payload.getType()) //
+		      .setProperty("name", name)//
+		      .setProperty("ip", ipAddress);
 
 		ModelResponse<TransactionReport> response = m_service.invoke(request);
 		TransactionReport report = response.getModel();
@@ -185,7 +188,7 @@ public class Handler implements PageHandler<Context> {
 		String domain = payload.getDomain();
 		String ipAddress = payload.getIpAddress();
 		ModelRequest request = new ModelRequest(domain, payload.getDate()).setProperty("type", payload.getType())
-								.setProperty("ip", ipAddress);
+		      .setProperty("ip", ipAddress);
 
 		if (m_service.isEligable(request)) {
 			ModelResponse<TransactionReport> response = m_service.invoke(request);
@@ -207,6 +210,8 @@ public class Handler implements PageHandler<Context> {
 	@Override
 	@OutboundActionMeta(name = "t")
 	public void handleOutbound(Context ctx) throws ServletException, IOException {
+		Cat.logMetricForCount("http-request-transaction");
+
 		Model model = new Model(ctx);
 		Payload payload = ctx.getPayload();
 
@@ -231,18 +236,18 @@ public class Handler implements PageHandler<Context> {
 		switch (action) {
 		case HOURLY_REPORT:
 			TransactionReport report = getHourlyReport(payload);
-			report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 
 			if (report != null) {
+				report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 				model.setReport(report);
 				buildTransactionMetaInfo(model, payload, report);
 			}
 			break;
 		case HISTORY_REPORT:
 			report = m_reportService.queryReport(domain, payload.getHistoryStartDate(), payload.getHistoryEndDate());
-			report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 
 			if (report != null) {
+				report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 				model.setReport(report);
 				buildTransactionMetaInfo(model, payload, report);
 			}
@@ -250,70 +255,87 @@ public class Handler implements PageHandler<Context> {
 		case HISTORY_GRAPH:
 			report = m_reportService.queryReport(domain, start, end);
 
-			if (Constants.ALL.equalsIgnoreCase(ip)) {
-				buildDistributionInfo(model, type, name, report);
-			}
+			if (report != null) {
+				if (Constants.ALL.equalsIgnoreCase(ip)) {
+					buildDistributionInfo(model, type, name, report);
+				}
 
-			report = m_mergeHelper.mergeAllMachines(report, ip);
-			new TransactionTrendGraphBuilder().buildTrendGraph(model, payload, report);
+				report = m_mergeHelper.mergeAllMachines(report, ip);
+				new TransactionTrendGraphBuilder().buildTrendGraph(model, payload, report);
+			}
 			break;
 		case GRAPHS:
 			report = getHourlyGraphReport(model, payload);
 
-			if (Constants.ALL.equalsIgnoreCase(ipAddress)) {
-				buildDistributionInfo(model, type, name, report);
-			}
-			if (name == null || name.length() == 0) {
-				name = Constants.ALL;
+			if (report != null) {
+				if (Constants.ALL.equalsIgnoreCase(ipAddress)) {
+					buildDistributionInfo(model, type, name, report);
+				}
+				if (name == null || name.length() == 0) {
+					name = Constants.ALL;
+				}
+
+				report = m_mergeHelper.mergeAllNames(report, ip, name);
+
+				model.setReport(report);
+				buildTransactionNameGraph(model, report, type, name, ip);
 			}
 
-			report = m_mergeHelper.mergeAllNames(report, ip, name);
-
-			model.setReport(report);
-			buildTransactionNameGraph(model, report, type, name, ip);
 			break;
 		case HOURLY_GROUP_REPORT:
 			report = getHourlyReport(payload);
-			report = filterReportByGroup(report, domain, group);
-			report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 
 			if (report != null) {
-				model.setReport(report);
+				report = filterReportByGroup(report, domain, group);
+				report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 
-				buildTransactionMetaInfo(model, payload, report);
+				if (report != null) {
+					model.setReport(report);
+
+					buildTransactionMetaInfo(model, payload, report);
+				}
 			}
 			break;
 		case HISTORY_GROUP_REPORT:
 			report = m_reportService.queryReport(domain, payload.getHistoryStartDate(), payload.getHistoryEndDate());
-			report = filterReportByGroup(report, domain, group);
-			report = m_mergeHelper.mergeAllMachines(report, ipAddress);
 
 			if (report != null) {
-				model.setReport(report);
-				buildTransactionMetaInfo(model, payload, report);
+				report = filterReportByGroup(report, domain, group);
+				report = m_mergeHelper.mergeAllMachines(report, ipAddress);
+
+				if (report != null) {
+					model.setReport(report);
+					buildTransactionMetaInfo(model, payload, report);
+				}
 			}
 			break;
 		case GROUP_GRAPHS:
 			report = getHourlyGraphReport(model, payload);
-			report = filterReportByGroup(report, domain, group);
-			buildDistributionInfo(model, type, name, report);
 
-			if (name == null || name.length() == 0) {
-				name = Constants.ALL;
+			if (report != null) {
+				report = filterReportByGroup(report, domain, group);
+				buildDistributionInfo(model, type, name, report);
+
+				if (name == null || name.length() == 0) {
+					name = Constants.ALL;
+				}
+				report = m_mergeHelper.mergeAllNames(report, ip, name);
+
+				model.setReport(report);
+				buildTransactionNameGraph(model, report, type, name, ip);
 			}
-			report = m_mergeHelper.mergeAllNames(report, ip, name);
-
-			model.setReport(report);
-			buildTransactionNameGraph(model, report, type, name, ip);
 			break;
 		case HISTORY_GROUP_GRAPH:
 			report = m_reportService.queryReport(domain, start, end);
-			report = filterReportByGroup(report, domain, group);
 
-			buildDistributionInfo(model, type, name, report);
+			if (report != null) {
+				report = filterReportByGroup(report, domain, group);
 
-			report = m_mergeHelper.mergeAllMachines(report, ip);
-			new TransactionTrendGraphBuilder().buildTrendGraph(model, payload, report);
+				buildDistributionInfo(model, type, name, report);
+
+				report = m_mergeHelper.mergeAllMachines(report, ip);
+				new TransactionTrendGraphBuilder().buildTrendGraph(model, payload, report);
+			}
 			break;
 		}
 
@@ -343,24 +365,11 @@ public class Handler implements PageHandler<Context> {
 	}
 
 	public enum DetailOrder {
-		TYPE,
-		NAME,
-		TOTAL_COUNT,
-		FAILURE_COUNT,
-		MIN,
-		MAX,
-		SUM,
-		SUM2
+		TYPE, NAME, TOTAL_COUNT, FAILURE_COUNT, MIN, MAX, SUM, SUM2
 	}
 
 	public enum SummaryOrder {
-		TYPE,
-		TOTAL_COUNT,
-		FAILURE_COUNT,
-		MIN,
-		MAX,
-		SUM,
-		SUM2
+		TYPE, TOTAL_COUNT, FAILURE_COUNT, MIN, MAX, SUM, SUM2
 	}
 
 }
